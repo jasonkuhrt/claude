@@ -18,5 +18,9 @@
 !templates/
 !templates/**
 
+# Allow docs directory for modular documentation
+!docs/
+!docs/**
+
 # But still ignore .DS_Store everywhere
 **/.DS_Store
