@@ -307,7 +307,7 @@
     ├── added.ts               // member
     └── removed.ts             // member
   ```
-  - Implementation:
+  - Implementation (example with Effect Schema):
     ```typescript
     // lifecycle-event.ts
     import { Added } from './added.js' // direct import, not from $$.ts
@@ -475,7 +475,7 @@ import { Other } from '#lib/other'   // Use subpaths for global libs only
 
 ### Overview
 
-ADT (Algebraic Data Type) Unions are discriminated unions with multiple member types that provide type-safe access to union members and constructors. This is a specialized pattern used in Effect Schema for complex data modeling.
+ADT (Algebraic Data Type) Unions are discriminated unions with multiple member types that provide type-safe access to union members and constructors. This is a specialized pattern commonly used with schema libraries (like Effect Schema, Zod, etc.) for complex data modeling.
 
 ### Core Principles
 
@@ -487,14 +487,14 @@ ADT (Algebraic Data Type) Unions are discriminated unions with multiple member t
     - Each member should be re-exported as namespace from $$.ts using `export * as <MemberName> from './<member>.js'`
     - The union schema itself is exported from the main module file
     - Imports all members and exports a union schema of them
-    - example `export const Catalog = Schema.Union(Versioned,Unversioned)` in `catalog.ts` under `catalog/` directory
+    - example (with Effect Schema): `export const Catalog = Schema.Union(Versioned,Unversioned)` in `catalog.ts` under `catalog/` directory
 
 - **Member Level**
-  - Use `Schema.TaggedStruct` to define members
+  - Use tagged/discriminated structures to define members (e.g., `Schema.TaggedStruct` in Effect)
   - Each member is a single file (e.g., `versioned.ts`, `unversioned.ts`)
     - tag name: `<adt name><member name>` pascal case
     - naming of export schema in module: `<member name>` pascal case
-    - example: `export const Versioned = Schema.TaggedStruct('CatalogVersioned', ...` in `versioned.ts` under `catalog/` directory
+    - example: `export const Versioned = TaggedStruct('CatalogVersioned', ...` in `versioned.ts` under `catalog/` directory
 
 ### ADT Union Directory Structure
 
@@ -506,9 +506,9 @@ src/lib/catalog/
 │                 # export * from './catalog.js'
 ├── catalog.ts    # import { Versioned } from './versioned.js'
 │                 # import { Unversioned } from './unversioned.js'
-│                 # export const Catalog = Schema.Union(Versioned, Unversioned)
-├── versioned.ts  # export const Versioned = Schema.TaggedStruct('CatalogVersioned', { ... })
-└── unversioned.ts # export const Unversioned = Schema.TaggedStruct('CatalogUnversioned', { ... })
+│                 # export const Catalog = createUnion(Versioned, Unversioned)
+├── versioned.ts  # export const Versioned = createTaggedType('CatalogVersioned', { ... })
+└── unversioned.ts # export const Unversioned = createTaggedType('CatalogUnversioned', { ... })
 ```
 
 ### ADT Import Patterns
@@ -548,11 +548,11 @@ const removedEvent: Removed.Removed = Removed.make({ ... })
 For discriminated unions, use the factory pattern to create members:
 
 ```typescript
-// Define union
+// Define union (example with Effect Schema)
 const MyUnion = Schema.Union(MemberA, MemberB)
 
-// Create factory using EffectKit
-const make = EffectKit.Schema.Union.make(MyUnion)
+// Create factory using your library's union utilities
+const make = createUnionFactory(MyUnion)  // Library-specific implementation
 
 // Use with full type safety - tag determines fields and return type
 const instanceA = make('MemberATag', {/* fields specific to MemberA */})
@@ -577,8 +577,8 @@ const createEvent = (type: 'Added' | 'Removed') => {
     : LifecycleEvent.Removed.make(baseEvent)
 }
 
-// After: clean factory approach
-const createEvent = EffectKit.Schema.Union.make(LifecycleEvent.LifecycleEvent)
+// After: clean factory approach (library-specific implementation)
+const createEvent = createUnionFactory(LifecycleEvent.LifecycleEvent)
 const added = createEvent('LifecycleEventAdded', { schema, revision })
 const removed = createEvent('LifecycleEventRemoved', { schema, revision })
 ```
