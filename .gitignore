@@ -1,0 +1,22 @@
+# Ignore everything by default (whitelist approach)
+*
+
+# Explicitly allow version-controlled files
+!.gitignore
+!CLAUDE.md
+!README.md
+
+# Allow commands directory and its contents
+!commands/
+!commands/**
+
+# Allow scripts directory and its contents
+!scripts/
+!scripts/**
+
+# Allow templates directory and its contents
+!templates/
+!templates/**
+
+# But still ignore .DS_Store everywhere
+**/.DS_Store
