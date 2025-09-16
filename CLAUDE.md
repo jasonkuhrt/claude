@@ -259,7 +259,9 @@ Check and fix library layout conventions
 
 ## Local Libraries
 
-**IMPORTANT**: Follow all conventions detailed in: `docs/conventions/library.md`
+**IMPORTANT**: Follow all conventions detailed in:
+- Base conventions: `docs/conventions/library.md`
+- ADT patterns: `docs/conventions/library-adt.md`
 
 ## Temporary Directories
 - When creating temporary test projects or demos, always use local directories within the current project (e.g., `test-*`, `tmp/*`, `demo-*`)
