@@ -1,5 +1,7 @@
 # Claude Memory - @jasonkuhrt
 
+**Note**: All referenced documentation paths in this file are relative to this file's location (`~/.claude/`).
+
 ## Core Principles
 ### Communication & Collaboration
 - Be direct about limitations or concerns
@@ -40,7 +42,7 @@
     - ✅ `type Transform<$Input> = $Input extends string ? number : boolean`
     - ✅ `interface Container<$T> { value: $T }`
     - ❌ `type Transform<Input> = Input extends string ? number : boolean`
-  
+
   - **Functions and methods** - apply these rules in order:
     1. **Mapped to value parameter**: Use the value parameter's name
        - ✅ `function process<value>(value: value): value`
@@ -48,17 +50,17 @@
        - **EXCEPTION - Type guards**: Add `_` suffix to type param
          - ✅ `function isString<value_>(value: unknown): value is value_`
          - ❌ `function isString<value>(value: unknown): value is value`
-    
-    2. **NOT mapped to value parameter**: Use `$` prefix  
+
+    2. **NOT mapped to value parameter**: Use `$` prefix
        - ✅ `function create<$T>(): $T`
        - ✅ `function compose<$A, $B, $C>(f: ($a: $A) => $B, g: ($b: $B) => $C): ($a: $A) => $C`
        - ❌ `function create<T>(): T`
-  
+
   - **EXCEPTION - Type utility internals**: Parameters with `___` prefix are implementation details
     - ✅ Keep as-is: `type Utility<$T, ___Internal = SomeDefault<$T>> = ...`
     - ❌ Don't change: `type Utility<$T, $Internal = SomeDefault<$T>> = ...`
     - These are "private" to the type implementation and conventionally marked with triple underscore
-  
+
   - **Mapped types**: Use specific single-letter iterators
     - For objects: Use `k` (key)
       - ✅ `{ [k in keyof $T]: $T[k] }`
@@ -67,7 +69,7 @@
     - For tuples/arrays: Use `i` (index)
       - ✅ `{ [i in keyof $T]: Transform<$T[i]> }`
       - ❌ `{ [I in keyof $T]: Transform<$T[I]> }`
-  
+
   - **Infer clauses**: Use `__lowercase__` pattern
     - ✅ `$T extends Array<infer __element__> ? __element__ : never`
     - ✅ `$T extends { tag: infer __tag__ } ? __tag__ : never`
@@ -255,10 +257,9 @@ Check and fix library layout conventions
 - If you don't know an API, traverse the source code to find it
 - Guessing APIs wastes time and is extremely annoying
 
-
 ## Local Libraries
 
-**IMPORTANT**: Follow all conventions detailed in: `~/.claude/docs/conventions/library.md`
+**IMPORTANT**: Follow all conventions detailed in: `docs/conventions/library.md`
 
 ## Temporary Directories
 - When creating temporary test projects or demos, always use local directories within the current project (e.g., `test-*`, `tmp/*`, `demo-*`)
