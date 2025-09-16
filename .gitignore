@@ -21,6 +21,8 @@
 # Allow docs directory for modular documentation
 !docs/
 !docs/**
+!docs/conventions/
+!docs/conventions/**
 
 # But still ignore .DS_Store everywhere
 **/.DS_Store

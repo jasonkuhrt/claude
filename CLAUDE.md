@@ -258,7 +258,7 @@ Check and fix library layout conventions
 
 ## Local Libraries
 
-**IMPORTANT**: Follow all conventions detailed in: `~/.claude/docs/library-conventions.md`
+**IMPORTANT**: Follow all conventions detailed in: `~/.claude/docs/conventions/library.md`
 
 ## Temporary Directories
 - When creating temporary test projects or demos, always use local directories within the current project (e.g., `test-*`, `tmp/*`, `demo-*`)

@@ -290,7 +290,7 @@
 
 ## ADT Patterns
 
-For patterns specific to Algebraic Data Types (ADTs) and discriminated unions, see [Library Conventions: ADT Extension](./library-conventions-adt.md).
+For patterns specific to Algebraic Data Types (ADTs) and discriminated unions, see [Library Conventions: ADT Extension](./library-adt.md).
 
 # Examples
 

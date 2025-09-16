@@ -1,6 +1,6 @@
 # Library Conventions: ADT Extension
 
-This document extends the base [Library Conventions](./library-conventions.md) with patterns specific to Algebraic Data Types (ADTs) and discriminated unions.
+This document extends the base [Library Conventions](./library.md) with patterns specific to Algebraic Data Types (ADTs) and discriminated unions.
 
 ## Library: Union ADT (Algebraic Data Type) Pattern
 
