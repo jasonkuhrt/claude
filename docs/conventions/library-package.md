@@ -23,6 +23,8 @@ This document specifies the differences.
 
 ### Example
 
+Layout
+
 ```
 /package.json       // Contains exports field
 /src/
@@ -46,14 +48,29 @@ Package.json
 ## Multi Export Package
 
 - If there are multiple package exports, there should be a `./src/exports` directory that contains export modules
-- All modules in `/src/exports` must be listed in the `exports` field of package.json with path mirroring, following these conventions:
-  - Ignore Barrel modules (`<name>$$.ts`)
-  - Ignore Test modules (`<name>.test.ts`, `<name>.test.fixtures.ts`)
-  - Name of `index` is special, it maps to the main export of a path, e.g.:
-    - src/exports/index -> .
+- All modules in `/src/exports` must be listed in the `exports` field of package.json following these rules:
+  - If is Barrel module (`$$.ts`, `<name>$$.ts`), ignore
+  - If is Test module (`<name>.test.ts`, `<name>.test.fixtures.ts`), ignore
+  - If is `index.ts`, becomes the main export of parent path, e.g.:
+    - src/exports/index.ts -> .
     - src/exports/foo/index.ts -> ./foo
+  - If is `$.ts`, extends semantics of `index.ts` with:
+      - Must be a namespace module
+      - Its namespace is the PascalCase version of the directory name, or, if main package export, the PascalCase version of the package name.
+  - If is `<name>$.ts`, extends semantics of `<name>.ts` with:
+    - Must be a namespace module
+    - Its namespace is the PascalCase version of the file name
+    - It maps to package export of`./...<path>/<name>` meaning the `$` suffix is elided
+  - If is `<name>.ts`, becomes package export of `./...<path>/<name>`
+- Additional conventions that should be used:
+  - If a package export needs a barrel module then use convention of `<name>$$.ts` in same directory
+- The following states are invalid:
+  - Presence of both `index.ts` and `$.ts` in same directory
+  - Presence of both `<name>.ts` and `<name>$.ts` in same directory
 
 ### Example
+
+Layout
 
 ```
 /package.json     // Contains exports field
@@ -68,7 +85,7 @@ Package.json
     foo.ts        // Package Export
     foo$$.ts      // Barrel module (for foo.ts)
     bar/
-      index.ts      // Package Export
+      $.ts          // Package Export, Namespace Module
       qux.ts        // Package Export
 ```
 
@@ -84,7 +101,7 @@ Package.json
       "default": "./build/exports/foo.js"
     },
     "./bar": {
-      "default": "./build/exports/bar/index.js"
+      "default": "./build/exports/bar/$.js"
     }
     "./bar/qux": {
       "default": "./build/exports/bar/qux.js"
