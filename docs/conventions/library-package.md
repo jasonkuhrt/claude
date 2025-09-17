@@ -40,7 +40,7 @@ Package.json
   "exports": {
     ".": {
       "default": "./build/$.js"
-    },
+    }
   }
 }
 ```
@@ -55,8 +55,9 @@ Package.json
     - src/exports/index.ts -> .
     - src/exports/foo/index.ts -> ./foo
   - If is `$.ts`, extends semantics of `index.ts` with:
-      - Must be a namespace module
-      - Its namespace is the PascalCase version of the directory name, or, if main package export, the PascalCase version of the package name.
+    - Must be a namespace module
+    - Its namespace is the PascalCase version of the directory name, or, if main package export, the PascalCase version
+      of the package name.
   - If is `<name>$.ts`, extends semantics of `<name>.ts` with:
     - Must be a namespace module
     - Its namespace is the PascalCase version of the file name
@@ -102,7 +103,7 @@ Package.json
     },
     "./bar": {
       "default": "./build/exports/bar/$.js"
-    }
+    },
     "./bar/qux": {
       "default": "./build/exports/bar/qux.js"
     }

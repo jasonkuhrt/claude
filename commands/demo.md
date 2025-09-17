@@ -1,24 +1,18 @@
 ---
 # YAML Frontmatter Configuration
-# Documentation: https://docs.anthropic.com/en/docs/claude-code/slash-commands
+# Documentation: https://docs.claude.com/en/docs/claude-code/slash-commands#frontmatter
 
-# allowed-tools: Restricts which tools Claude can use
-# Format: ToolName or Bash(command:pattern)
-# Verified syntax from docs: Bash(git add:*), Bash(git status:*)
+# Restricts which tools Claude can use
 allowed-tools: Read, Grep, Glob, Bash(ls:*), Bash(echo:*), Bash(pwd), Bash(date), Edit, MultiEdit
 
-# argument-hint: Displayed in parentheses after command name
-# Shows expected argument format to users
-# Verified syntax: [arg1] [arg2] format
-argument-hint: [topic] [optional-flags]
+# Displayed in parentheses after command name to communicate expected argument format to users
+argument-hint: '[topic] [optional-flags]'
 
-# description: Brief explanation shown in /help
-# Verified field from documentation
+# Brief explanation shown in /help
 description: Comprehensive demo of all slash command capabilities
 
-# model: Override the default model (optional)
-# Verified example from docs: claude-3-5-sonnet-20241022
-# model: claude-3-5-sonnet-20241022
+# Override the default model (optional)
+model: claude-opus-4-1-20250805
 ---
 
 # Claude Code Slash Command Demo

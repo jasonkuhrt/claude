@@ -1,6 +1,28 @@
+---
+description: Fix library structure convention violations
+---
+
 # Fix Library Conventions
 
-Review the current project's library structure against the documented conventions and fix any violations.
+## Goal
+
+- Review the current project's library structure against the documented conventions
+- Fix any violations found in library organization and patterns
+
+## Usage
+
+- `/fix-conventions` - Analyze and fix library convention violations
+
+## Examples
+
+- `/fix-conventions` - Check main library (if has exports) and local libraries
+- Fixes missing $.ts and $$.ts files
+- Corrects namespace export patterns
+- Updates import/export structures
+
+## Arguments
+
+No arguments required - analyzes entire project structure
 
 ## Instructions
 
