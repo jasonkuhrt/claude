@@ -4,18 +4,31 @@ Review the current project's library structure against the documented convention
 
 ## Instructions
 
-1. **Read the convention documents**:
-   - Review `~/.claude/docs/conventions/library.md` for base library conventions
-   - Review `~/.claude/docs/conventions/library-adt.md` for ADT-specific patterns if applicable
+1. **Determine project type**:
+   - Check if package.json has `exports` field
+   - If `exports` exists: This is a library package (the package itself is a library)
+     - Main library code at `/src/*`
+     - May also have local libraries at `/src/lib/*`
+   - If no `exports`: This is not a library package (likely an application)
+     - Only has local libraries at `/src/lib/*`
 
-2. **Analyze the current project structure**:
-   - Scan all directories under `src/lib/` (or similar library directories)
-   - Identify the type of each library (Namespace Simple, Namespace Complex, Barrel, ADT Union)
+2. **Read the appropriate convention document**:
+   - If has `exports`: Review `~/.claude/docs/conventions/library-package.md` for main library
+   - For any local libraries at `/src/lib/*`: Review `~/.claude/docs/conventions/library-local.md`
+   - For ADT patterns: Review `~/.claude/docs/conventions/library-adt.md`
+
+3. **Analyze the current project structure**:
+   - If has `exports`: Check `/src/*` structure for main library
+   - Check `/src/lib/*` for any local libraries (in both library packages and applications)
+   - Identify library pattern (Namespace only vs Namespace + Barrel)
    - Check for proper file structure ($.ts, $$.ts files)
    - Verify import/export patterns
-   - Check package.json import mappings
 
-3. **Identify violations**:
+4. **Check configuration**:
+   - If has `exports`: Verify `exports` field points to correct build output
+   - For any local libraries: Verify `imports` field with `#lib/*` mappings and tsconfig.json paths
+
+5. **Identify violations**:
    - Missing required files ($.ts, $$.ts)
    - Incorrect namespace exports
    - Wrong import patterns (e.g., importing from own $.ts)
@@ -23,7 +36,7 @@ Review the current project's library structure against the documented convention
    - Generic module names at library root (types.ts, utils.ts, helpers.ts)
    - Incorrect ADT structure if applicable
 
-4. **Fix violations**:
+6. **Fix violations**:
    - Create missing $.ts and $$.ts files with correct export patterns
    - Fix namespace export statements
    - Update package.json import mappings
@@ -31,12 +44,8 @@ Review the current project's library structure against the documented convention
    - Reorganize files if structure is fundamentally wrong
    - Fix import statements that violate conventions
 
-5. **Report what was done**:
+7. **Report what was done**:
    - List all violations found
    - Describe each fix applied
    - Note any issues that require manual intervention
    - Suggest any architectural improvements
-
-## Context
-
-This command replaces the old bash script approach with intelligent, context-aware fixing using Claude's understanding of the codebase and conventions. Unlike a script that can only pattern match, this approach understands the intent and can make appropriate decisions based on the actual code structure and purpose.

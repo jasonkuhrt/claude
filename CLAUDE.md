@@ -3,7 +3,9 @@
 **Note**: All referenced documentation paths in this file are relative to this file's location (`~/.claude/`).
 
 ## Core Principles
+
 ### Communication & Collaboration
+
 - Be direct about limitations or concerns
 - Challenge me with better system design and software techniques
 - Propose multiple solutions when trade-offs exist
@@ -16,12 +18,14 @@
 - Avoid use of emojis in text like markdown titles and code comments
 
 ### Work Style
+
 - I have ADHD - help me break down work into smaller shippable iterations
 - After several failed solutions, stop guessing - research or ask for help
 - Make better decisions independently
 - Understand priorities and work efficiently with my setup
 
 ### Decision Making
+
 - Prefer existing patterns over introducing new ones
 - Choose readability over cleverness
 - Document non-obvious decisions
@@ -31,7 +35,9 @@
 ## Technical Preferences
 
 ### Language & Runtime
+
 #### TypeScript
+
 - **ALWAYS** use ESM modules, never CJS
 - **ALWAYS** verify type checks before running code
 - Prefer function expressions over declarations (except overloaded functions)
@@ -78,6 +84,7 @@
 - When using complex conditional return types, cast implementation to `any` with comment
 
 #### Code Style
+
 - Short-circuit early (return/continue) over if-else chains
 - Use proper JSDoc tags like `@default`
 - Long conditional types: align on `?` and `:` with `//dprint-ignore`
@@ -91,16 +98,12 @@
   - **CRITICAL**: Never use multiple JSDoc blocks for the same declaration - only the closest one is effective
   - **CRITICAL**: Avoid duplicate JSDoc - if a const implements an interface with JSDoc, don't repeat it
   - **Focus**: Place JSDoc where tooling will actually pick it up (hover info, auto-complete, docs)
-  - **DO**: NAMESPACE EXPORT HACK: For export * as Name, use @ts-expect-error with duplicate namespace:
-        // @ts-expect-error Duplicate identifier
-        export * as Utils from './utils'
-        /**
-         * ...
-         */
-        export namespace Utils {}
+  - **DO**: NAMESPACE EXPORT HACK: For export * as Name, use @ts-expect-error with duplicate namespace: //
+    @ts-expect-error Duplicate identifier export * as Utils from './utils' /** * ... */ export namespace Utils {}
 - **Test Organization Rules**:
   - **Avoid redundant top-level describe blocks** that repeat information already in the file path
-  - Example: In `src/arr/traits/eq.test.ts`, don't use `describe('Arr.Eq implementation')` - the file path already indicates this
+  - Example: In `src/arr/traits/eq.test.ts`, don't use `describe('Arr.Eq implementation')` - the file path already
+    indicates this
   - Focus describe blocks on behavior groupings, not restating what's being tested
 - **Type-Level Transformations**: Use conditional types over function overloads for type mappings
   - Define type-level utilities (e.g., `type Abs<T>`) that map input types to output types
@@ -109,6 +112,7 @@
   - Example: `type Sign<T> = T extends Positive ? 1 : T extends Negative ? -1 : ...`
 
 #### Node.js & Package Management
+
 - Use pnpm (not npm)
 - Use `pnpm env` (not nvm)
 - Prefer `pnpm run --concurrently` over concurrently package
@@ -116,6 +120,7 @@
 - Prefer zx package for scripts over bash
 
 ### Project Structure
+
 - `/lib` - Domain-agnostic code (potential standalone packages)
 - `/helpers` - Domain-coupled abstractions
 - `sandbox.ts` - Temporary work file, use freely
@@ -123,7 +128,9 @@
 - **NEVER** use or modify main package exports (index.ts) - only use package.json exports field
 
 ### Frameworks & Tools
+
 #### React
+
 - One component per module
 - Component name matches module name
 - Props interface named `Props`
@@ -131,10 +138,12 @@
 - Use design tokens when available
 
 #### Build Tools
+
 - Vite: Use Rolldown (not Rollup)
 - Use project formatter (dprint, prettier, etc.)
 
 #### Testing
+
 - 1:1 test file mapping (`foo.ts` → `foo.test.ts`)
 - Prefer property-based testing with fast-check
 - Few high-impact tests over exhaustive coverage
@@ -146,12 +155,14 @@
 ## Development Workflow
 
 ### Before Changes
+
 - Read TypeScript types and JSDoc for APIs
 - Check existing patterns
 - Verify property names exist
 - Respect configuration patterns
 
 ### Making Changes
+
 - Verify after each change:
   - No TypeScript errors
   - No syntax errors
@@ -160,6 +171,7 @@
 - Make small, incremental changes
 
 ### After Changes
+
 - Run type checks: `pnpm check:types`
 - Run tests: `pnpm test [path]`
 - Format code: `pnpm fix:format`
@@ -167,6 +179,7 @@
 - Be explicit about uncertainties
 
 ### Git & GitHub
+
 - Never push to main branch
 - Feature branches: `feat/description`
 - Bug branches: `fix/description`
@@ -176,6 +189,7 @@
 - Check workflow runs, deployment statuses, and logs yourself before asking for debug information
 
 ## Error Handling & Debugging
+
 - Don't suppress logs as a "solution"
 - Use Result/Either for expected errors
 - Throw Error objects, not strings
@@ -184,6 +198,7 @@
 - Don't hide errors with spreading or optional chaining
 
 ## Package Preferences
+
 - `@wollybeard/kit` - Use when installed
 - `playwright/test` over `@playwright/test`
 - `rg` (ripgrep) over grep
@@ -192,21 +207,26 @@
 - `zod/v4` - Always use zod/v4 instead of zod
 
 ## Session Management
+
 - Check for `CLAUDE_SESSION.md` and restore
 - Update on "checkpoint" command
 - Keep track of work in progress
 
 ## Editor Specific
+
 ### Zed
+
 - Change global config in ~/.config/zed unless specified
 
 ## Performance Considerations
+
 - Avoid unnecessary iterations
 - Use early returns
 - Consider memory usage for large structures
 - Profile before optimizing
 
 ## Common Pitfalls
+
 - Don't use `any` unless absolutely necessary
 - Don't mutate function parameters
 - Don't create files without explicit request
@@ -214,6 +234,7 @@
 - Don't make assumptions about APIs
 
 ## CRITICAL RULES
+
 - **NEVER GUESS APIs** - Always look up the actual API in the source code
 - When using any library (especially @wollybeard/kit), ALWAYS check:
   - The actual exports
@@ -225,10 +246,14 @@
 ## Local Libraries
 
 **IMPORTANT**: Follow all conventions detailed in:
+
 - Base conventions: `docs/conventions/library.md`
 - ADT patterns: `docs/conventions/library-adt.md`
 
 ## Temporary Directories
-- When creating temporary test projects or demos, always use local directories within the current project (e.g., `test-*`, `tmp/*`, `demo-*`)
-- Never attempt to use OS-level `/tmp` directory as Claude Code cannot cd outside the original working directory due to security restrictions
+
+- When creating temporary test projects or demos, always use local directories within the current project (e.g.,
+  `test-*`, `tmp/*`, `demo-*`)
+- Never attempt to use OS-level `/tmp` directory as Claude Code cannot cd outside the original working directory due to
+  security restrictions
 - Clean up temporary directories after use unless they contain valuable reference material

@@ -1,6 +1,7 @@
 # Library Conventions: ADT Extension
 
-This document extends the base [Library Conventions](./library.md) with patterns specific to Algebraic Data Types (ADTs) and discriminated unions.
+This document extends the base [Library Conventions](./library.md) with patterns specific to Algebraic Data Types (ADTs)
+and discriminated unions.
 
 ## Library: Union ADT (Algebraic Data Type) Pattern
 
@@ -38,7 +39,9 @@ This document extends the base [Library Conventions](./library.md) with patterns
 
 ### Overview
 
-ADT (Algebraic Data Type) Unions are discriminated unions with multiple member types that provide type-safe access to union members and constructors. This is a specialized pattern commonly used with schema libraries (like Effect Schema, Zod, etc.) for complex data modeling.
+ADT (Algebraic Data Type) Unions are discriminated unions with multiple member types that provide type-safe access to
+union members and constructors. This is a specialized pattern commonly used with schema libraries (like Effect Schema,
+Zod, etc.) for complex data modeling.
 
 ### Core Principles
 
@@ -50,14 +53,16 @@ ADT (Algebraic Data Type) Unions are discriminated unions with multiple member t
     - Each member should be re-exported as namespace from $$.ts using `export * as <MemberName> from './<member>.js'`
     - The union schema itself is exported from the main module file
     - Imports all members and exports a union schema of them
-    - example (with Effect Schema): `export const Catalog = Schema.Union(Versioned,Unversioned)` in `catalog.ts` under `catalog/` directory
+    - example (with Effect Schema): `export const Catalog = Schema.Union(Versioned,Unversioned)` in `catalog.ts` under
+      `catalog/` directory
 
 - **Member Level**
   - Use tagged/discriminated structures to define members (e.g., `Schema.TaggedStruct` in Effect)
   - Each member is a single file (e.g., `versioned.ts`, `unversioned.ts`)
     - tag name: `<adt name><member name>` pascal case
     - naming of export schema in module: `<member name>` pascal case
-    - example: `export const Versioned = TaggedStruct('CatalogVersioned', ...` in `versioned.ts` under `catalog/` directory
+    - example: `export const Versioned = TaggedStruct('CatalogVersioned', ...` in `versioned.ts` under `catalog/`
+      directory
 
 ### ADT Union Directory Structure
 
@@ -173,4 +178,5 @@ const revision = { _tag: 'Revision', date: '2024-01-15', version: '1.0.0' }
 5. **Factory pattern** for type-safe member creation
 6. **Schema.make constructors** for all value creation
 
-This comprehensive ADT pattern ensures type safety, maintainability, and consistent API design across complex discriminated union types.
+This comprehensive ADT pattern ensures type safety, maintainability, and consistent API design across complex
+discriminated union types.
