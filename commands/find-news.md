@@ -1,5 +1,4 @@
 ---
-allowed-tools: WebSearch, WebFetch
 argument-hint: '[topic]'
 description: Get current information on any topic
 ---

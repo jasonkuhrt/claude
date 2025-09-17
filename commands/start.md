@@ -1,5 +1,4 @@
 ---
-allowed-tools: Read
 argument-hint: '[focus-area]'
 description: Initialize Claude session with project awareness
 ---
@@ -22,22 +21,20 @@ description: Initialize Claude session with project awareness
 - First argument ($1): Optional focus area for the session
 - When no arguments: General project awareness
 
-## Required Reading
-
-1. Fully read ~/.claude/docs/prompts/serena.md
-2. Fully read ~/.claude/CLAUDE.md
-3. If exists, fully read ./CLAUDE.md
-4. If exists, fully read ./.claude/serena-prompt.md (project-specific Serena overrides)
-
 ## Instructions
 
-After reading the required files:
+1. **Load configuration files WITHOUT showing errors**:
+   - FIRST use Bash to check which files exist (e.g., `ls ./CLAUDE.md 2>/dev/null` or `test -f ./CLAUDE.md && echo "exists"`)
+   - THEN only Read files that were confirmed to exist
+   - Required files: ~/.claude/docs/prompts/serena.md, ~/.claude/CLAUDE.md
+   - Optional files: ./CLAUDE.md, ./.claude/serena-prompt.md
+   - DO NOT attempt to Read optional files that don't exist
 
-1. **Confirm Serena awareness**:
-   - State: "✓ Serena MCP tools instructions loaded"
-   - If project has ./.claude/serena-prompt.md, note: "✓ Project-specific Serena instructions loaded"
+2. **Confirm awareness of loaded configurations**:
+   - For Serena: "✓ Serena MCP tools instructions loaded - will use symbolic tools for intelligent code reading"
+   - If project ./.claude/serena-prompt.md was found: "✓ Project-specific Serena overrides loaded"
 
-2. **Confirm personal configuration awareness**:
+3. **Confirm personal configuration awareness**:
    - Explicitly state: "✓ Personal configuration from ~/.claude/CLAUDE.md is active"
    - List 2-3 key principles from the user's personal CLAUDE.md to prove awareness, such as:
      - Core work style preferences (e.g., ADHD considerations, no flattery)

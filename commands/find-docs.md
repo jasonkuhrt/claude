@@ -1,5 +1,4 @@
 ---
-allowed-tools: mcp__ref__ref_search_documentation, mcp__ref__ref_read_url, WebSearch, WebFetch
 argument-hint: '[query]'
 description: Search technical documentation efficiently
 ---

@@ -1,5 +1,4 @@
 ---
-allowed-tools: WebSearch, WebFetch
 argument-hint: '[topic]'
 description: Deep AI-powered research on complex topics
 ---
