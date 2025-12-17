@@ -125,30 +125,8 @@ The custom MCP server:
 - Enables incremental LSP state (fast subsequent checks)
 - Standard protocol for language server integration
 
-## Testing
-
-```bash
-# Test tsgo LSP directly (should start and wait for input)
-tsgo --lsp -stdio
-
-# Test type checking in a project
-cd /path/to/ts/project
-tsgo --noEmit
-
-# Compare performance
-time tsc --noEmit
-time tsgo --noEmit
-```
-
 ## Resources
 
 - [TypeScript Native Port Announcement](https://devblogs.microsoft.com/typescript/typescript-native-port/)
 - [TypeScript 7 Progress (Dec 2025)](https://devblogs.microsoft.com/typescript/progress-on-typescript-7-december-2025/)
 - [typescript-go GitHub](https://github.com/microsoft/typescript-go)
-
-## Changelog
-
-- 2025-12-16: v0.1.0 - Initial release
-  - Custom MCP server wrapping tsgo LSP
-  - Stop hook for type-check gate
-  - `/tsgo:check` command for manual diagnostics
