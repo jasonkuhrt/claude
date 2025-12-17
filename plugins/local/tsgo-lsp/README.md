@@ -125,31 +125,6 @@ The custom MCP server:
 - Enables incremental LSP state (fast subsequent checks)
 - Standard protocol for language server integration
 
-## Troubleshooting
-
-### MCP server not starting
-
-1. Build the server: `cd ~/.claude/plugins/local/tsgo-lsp/server && pnpm build`
-2. Check that `@typescript/native-preview` is accessible: `npx -y @typescript/native-preview --version`
-3. Verify MCP is running: `/mcp`
-
-### No diagnostics returned
-
-1. Verify the MCP server is running: `/mcp`
-2. Check project has a `tsconfig.json`
-3. Try `/tsgo:check` manually
-
-### Slow first run
-
-The first invocation downloads packages via npx. Subsequent runs are faster.
-
-## Known Limitations
-
-- tsgo is in preview; some edge cases may differ from tsc
-- No downlevel emit below ES2021
-- Large projects may still take a few seconds on first check
-- Project references support may be incomplete
-
 ## Testing
 
 ```bash
