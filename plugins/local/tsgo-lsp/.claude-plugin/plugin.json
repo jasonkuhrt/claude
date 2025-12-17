@@ -1,0 +1,8 @@
+{
+  "name": "tsgo-lsp",
+  "version": "0.1.0",
+  "description": "Fast incremental TypeScript type checking via tsgo (TypeScript 7 native) LSP integration",
+  "author": {
+    "name": "jasonkuhrt"
+  }
+}

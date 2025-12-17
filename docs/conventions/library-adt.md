@@ -151,6 +151,152 @@ const added = createEvent('LifecycleEventAdded', { schema, revision })
 const removed = createEvent('LifecycleEventRemoved', { schema, revision })
 ```
 
+## Effect Schema Class Conventions
+
+When using Effect Schema classes (S.Class, S.TaggedClass), follow these conventions:
+
+### Class Definition
+
+- Always include `static is = S.is(ClassName)` inside the class body
+- Never use empty `{}` body
+- **Class name** = member name (the short, local name you use when importing)
+- **Tag name** = fully qualified name for discriminated unions
+
+```typescript
+// ✅ CORRECT - Class name matches member name, tag is fully qualified
+export class Versioned extends S.TaggedClass<Versioned>('DocumentVersioned')('DocumentVersioned', {
+  // ... fields
+}) {
+  static is = S.is(Versioned)
+}
+
+// ❌ WRONG - Class name uses fully qualified name
+export class DocumentVersioned extends S.TaggedClass<DocumentVersioned>('DocumentVersioned')('DocumentVersioned', {
+  // ... fields
+}) {
+  static is = S.is(DocumentVersioned)
+}
+
+// ✅ CORRECT - Simple class
+export class Revision extends S.Class<Revision>('Revision')({
+  date: S.String,
+  hash: S.String
+}) {
+  static is = S.is(Revision)
+}
+
+// ❌ WRONG - empty body
+export class Revision extends S.Class<Revision>('Revision')({
+  date: S.String,
+  hash: S.String
+}) {}
+```
+
+### Type Derivation from Effect Schemas
+
+**Use `.Type` property, NOT `S.Schema.Type<typeof>` helper.**
+
+```typescript
+// ✅ CORRECT
+export const MediaType = S.Literal('image', 'video')
+export type MediaType = typeof MediaType.Type
+
+// ❌ WRONG
+export type MediaType = S.Schema.Type<typeof MediaType>
+```
+
+**Rules:**
+- **Non-class schemas** (Literal, Struct, Union, Array): `typeof SchemaName.Type`
+- **Class schemas** (S.Class, S.TaggedClass): No type declaration needed, class IS the type
+- **Transformations**: `typeof Schema.Type` (decoded), `typeof Schema.Encoded` (input), `typeof Schema.Context` (deps)
+
+### Barrel Exports for Effect Schema Classes
+
+- Export classes directly, not as namespace exports
+- The class itself serves as the namespace
+
+```typescript
+// In $.ts
+// ✅ CORRECT - direct export for simple classes
+export { Revision } from './revision.js'
+export { Document } from './document.js'
+
+// ❌ WRONG - namespace export for simple classes
+export * as Revision from './revision.js'
+```
+
+### Simple ADT Pattern (Alternative to Full ADT Structure)
+
+For simpler ADTs where you don't need the full `$$.ts` barrel structure, you can use a simplified pattern:
+
+```typescript
+// version-coverage.ts - union definition file
+import { One } from './one.js'
+import { Set } from './set.js'
+import { Unversioned } from './unversioned.js'
+
+// Direct class exports (not namespace exports)
+export { One } from './one.js'
+export { Set } from './set.js'
+export { Unversioned } from './unversioned.js'
+
+// Union definition
+export const VersionCoverage = S.Union(One, Set, Unversioned)
+
+// Domain logic functions...
+```
+
+This pattern is appropriate when:
+- The ADT is relatively simple with few members
+- You don't need the additional namespace organization
+- Members are Effect Schema classes (S.Class or S.TaggedClass)
+
+Key rules for simple ADT pattern:
+- Use direct class exports (`export { ClassName }`)
+- No `$$.ts` file needed
+- `$.ts` exports namespace from main union file
+- Each member is still a separate file
+
+### Codec Conventions
+
+- Simple classes (S.Class, S.TaggedClass): Don't pre-define codec exports
+- Consumers should use `S.decode(ClassName)` directly
+- Transformation schemas (transformOrFail): Must export codecs since they're not classes
+
+```typescript
+// Simple class - no codec exports needed
+export class User extends S.Class<User>('User')({
+  name: S.String,
+  age: S.Number
+}) {
+  static is = S.is(User)
+}
+// Consumer uses: S.decode(User)
+
+// Transformation schema - needs codec exports
+export const Version = S.transformOrFail(S.String, VersionUnion, { ... })
+export const decode = S.decode(Version)
+export const decodeSync = S.decodeSync(Version)
+```
+
+### When Traditional Namespace Pattern Still Applies
+
+The original namespace export pattern (`export * as Name`) remains valid for:
+- ADT unions with multiple member classes that need grouping
+- Transformation schemas that aren't classes themselves
+- Complex modules with multiple related exports
+
+```typescript
+// ADT Union - namespace pattern is appropriate
+// In $$.ts
+export * as Added from './added.js'
+export * from './lifecycle-event.js'
+export * as Removed from './removed.js'
+
+// In $.ts
+export * as LifecycleEvent from './$$.js'
+```
+
 ### Critical: Schema Make Constructor
 
 **ALWAYS** use the schema's `make` constructor when manually constructing values:
@@ -168,6 +314,8 @@ const revision = { _tag: 'Revision', date: '2024-01-15', version: '1.0.0' }
 // - Default values are applied
 // - Transformations are executed
 ```
+
+**Note**: S.TaggedClass automatically provides the `.make()` method, no need to define it manually.
 
 ### ADT Library Rules Summary
 

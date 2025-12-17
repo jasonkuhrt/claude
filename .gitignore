@@ -6,6 +6,10 @@
 !CLAUDE.md
 !README.md
 
+# Allow marketplace config
+!.claude-plugin/
+!.claude-plugin/marketplace.json
+
 # Allow commands directory and its contents
 !commands/
 !commands/**
@@ -24,5 +28,14 @@
 !docs/conventions/
 !docs/conventions/**
 
+# Allow plugins/local for distributable plugins
+!plugins/
+!plugins/local/
+!plugins/local/tsgo-lsp/
+!plugins/local/tsgo-lsp/**
+
 # But still ignore .DS_Store everywhere
 **/.DS_Store
+
+# Ignore node_modules everywhere
+**/node_modules/

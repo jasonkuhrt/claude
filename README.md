@@ -11,12 +11,19 @@ Personal Claude AI configuration, conventions, and scripts.
 
 ## Resources
 
+- https://agents.md/
 - https://docs.claude.com/en/docs/claude-code/overview
 - https://github.com/hesreallyhim/awesome-claude-code
 - https://claudecodecommands.directory/
 - https://www.youtube.com/@PatrickOakleyEllis
 - https://github.com/OneRedOak/claude-code-workflows
 - https://github.com/anthropics/claude-code-action
+
+#### Skills
+
+- Example references: https://github.com/anthropics/skills/tree/main
+- Docs: https://docs.claude.com/en/docs/agents-and-tools/agent-skills/overview
+- Roundup: https://github.com/ComposioHQ/awesome-claude-skills
 
 #### MCPs
 
@@ -51,5 +58,15 @@ Personal Claude AI configuration, conventions, and scripts.
 
 #### Posts
 
+- 2025 11 https://blog.sshh.io/p/how-i-use-every-claude-code-feature
+- 2025 11 https://www.youtube.com/watch?v=kFpLzCVLA20 (skills)
+- 2025 10 https://simonwillison.net/2025/Oct/16/claude-skills/ (skills)
 - 2025 08 https://robertmarshall.dev/blog/turning-claude-code-into-a-development-powerhouse/
 - 2025 09 https://www.reddit.com/r/ClaudeAI/comments/1nfa4kj/if_youre_not_using_these_things_with_cc_then/
+
+#### Authors Creators Etc.
+
+- https://www.youtube.com/@indydevdan/videos
+- Jesse Vincent https://github.com/obra / https://blog.fsck.com
+- Simon Willison https://simonwillison.net/2025/Oct/16/claude-skills/
+- Shrivu Shankar https://substack.com/@shrivu

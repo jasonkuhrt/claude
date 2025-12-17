@@ -1,0 +1,14 @@
+{
+  "name": "jasonkuhrt",
+  "owner": {
+    "name": "jasonkuhrt"
+  },
+  "plugins": [
+    {
+      "name": "tsgo-lsp",
+      "source": "./plugins/local/tsgo-lsp",
+      "description": "Fast incremental TypeScript type checking via tsgo LSP",
+      "version": "0.2.0"
+    }
+  ]
+}

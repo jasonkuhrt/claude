@@ -53,18 +53,19 @@
     - ✅ `interface Container<$T> { value: $T }`
     - ❌ `type Transform<Input> = Input extends string ? number : boolean`
 
-  - **Functions and methods** - apply these rules in order:
-    1. **Mapped to value parameter**: Use the value parameter's name
-       - ✅ `function process<value>(value: value): value`
-       - ✅ `function map<item, result>(item: item, fn: (item) => result): result`
-       - **EXCEPTION - Type guards**: Add `_` suffix to type param
-         - ✅ `function isString<value_>(value: unknown): value is value_`
-         - ❌ `function isString<value>(value: unknown): value is value`
+  - **Functions and methods**: ALWAYS use `$` prefix matching the value parameter name
+    - ✅ `function process<$value>(value: $value): $value`
+    - ✅ `function map<$item, $result>(item: $item, fn: ($item) => $result): $result`
+    - ✅ `function join<$dir extends Dir, $rel extends Rel>(dir: $dir, rel: $rel): JoinResult<$dir, $rel>`
+    - ❌ `function process<value>(value: value): value` - Missing `$` prefix
 
-    2. **NOT mapped to value parameter**: Use `$` prefix
-       - ✅ `function create<$T>(): $T`
-       - ✅ `function compose<$A, $B, $C>(f: ($a: $A) => $B, g: ($b: $B) => $C): ($a: $A) => $C`
-       - ❌ `function create<T>(): T`
+    - **EXCEPTION - Type guards**: Add `_` suffix to avoid conflict with narrowed type
+      - ✅ `function isString<$value_>(value: unknown): value is $value_`
+      - ❌ `function isString<$value>(value: unknown): value is $value`
+
+    - **EXCEPTION - Generic returns**: When type param is NOT mapped to value parameter
+      - ✅ `function create<$T>(): $T`
+      - ✅ `function compose<$A, $B, $C>(f: ($a: $A) => $B, g: ($b: $B) => $C): ($a: $A) => $C`
 
   - **EXCEPTION - Type utility internals**: Parameters with `___` prefix are implementation details
     - ✅ Keep as-is: `type Utility<$T, ___Internal = SomeDefault<$T>> = ...`
@@ -241,6 +242,24 @@
   - ✅ RIGHT: Fix the runtime to provide all required services
   - Casting inputs masks real problems and leads to runtime failures
   - Only cast return values when implementing complex conditional types (with `as any` internally)
+- **Module Organization - KNUTH LITERAL Style**: Organize code from most abstract to least abstract
+  - Present main concepts and public exports first
+  - Implementation details and helper utilities belong at the bottom
+  - Creates a top-down reading experience where the API is immediately visible
+  - Implementation details are available when needed but don't clutter the main interface
+  - **Example**:
+    ```typescript
+    // Public exports and main types first (most abstract)
+    export type MainAPI = ...
+    export interface PublicInterface = ...
+
+    // Implementation types
+    type ImplementationType = ...
+
+    // Helpers and utilities last (least abstract)
+    type HelperType = ...
+    const helperFunction = ...
+    ```
 
 #### Node.js & Package Management
 
@@ -273,6 +292,35 @@
 - Vite: Use Rolldown (not Rollup)
 - Use project formatter (dprint, prettier, etc.)
 
+#### Panda CSS
+
+**CRITICAL**: Panda CSS's `css()` and `cva()` functions are **NOT type-safe** for token references due to the `AnyString` escape hatch.
+
+**The Problem**:
+```typescript
+// styled-system/types/style-props.d.ts
+type AnyString = (string & {})
+maxWidth?: ConditionalValue<... | AnyString>  // ❌ Accepts ANY string!
+```
+
+**❌ FORBIDDEN - String Literals**:
+```typescript
+// These compile but are NOT type-safe:
+css({ maxWidth: 'sizes.container.wide' })     // ❌ AnyString escape hatch
+css({ paddingInline: '4' })                    // ❌ Would accept 'INVALID' too
+```
+
+**✅ REQUIRED - token() Function**:
+```typescript
+import { token } from '../styled-system/tokens'
+
+css({ maxWidth: token('sizes.container.wide') })    // ✅ Type-safe
+css({ paddingInline: token('spacing.4') })           // ✅ Type-safe
+// css({ color: token('colors.INVALID.500') })       // ❌ TypeScript error!
+```
+
+**Rule**: If a string looks like a token path (contains `.` and starts with a token category like `sizes`, `spacing`, `colors`, `fontSizes`), it MUST use `token()`. Only exception: literal CSS values like `'100%'`, `'auto'`, `'bold'`, numeric values.
+
 #### Testing
 
 - 1:1 test file mapping (`foo.ts` → `foo.test.ts`)
@@ -297,23 +345,43 @@
 - **ALWAYS prefix type names with `_`** to satisfy linters checking for unused variables
 - Use `@ts-expect-error` for negative test cases (types that should fail)
 - Keep one `test()` block only for value-level assertions that need runtime context
+- **DO NOT use `Ts.Assert.Cases<>` or `Ts.Assert.Case<>`** - see below for why
 
-**Pattern:**
+**Preferred Pattern (Value-Level API):**
 ```typescript
-// ✅ CORRECT - Flat type aliases with _ prefix
-type _pass_case = Assert.Cases<
-  Assert.exact.string<string>,
-  Assert.exact.number<number>
->
+// ✅ BEST - Use value-level API even in .test-d.ts files
+// Reports ALL errors simultaneously (not just first one)
+Assert.exact.ofAs<string>().onAs<string>()
+Assert.exact.ofAs<number>().onAs<number>()
+
+// @ts-expect-error - type mismatch
+Assert.exact.ofAs<string>().onAs<number>()
+
+// Value-level tests with runtime context
+test('value-level guards', () => {
+  const value = Ts.as<number>()
+  Assert.exact.ofAs<number>().on(value)
+})
+```
+
+**Alternative Pattern (Individual Type Aliases):**
+```typescript
+// ✅ ACCEPTABLE - Individual type aliases (shows all errors)
+type _pass1 = Assert.exact.of<string, string>
+type _pass2 = Assert.exact.of<number, number>
 
 // @ts-expect-error - number not assignable to string
-type _error_case_1 = Assert.Case<Assert.exact<string, number>>
+type _fail1 = Assert.exact.of<string, number>
+```
 
-// Value-level tests need a test block
-test('value-level guards', () => {
-  // @ts-expect-error - any not assignable to literal
-  Assert.exact.of.as<3>()($a)
-})
+**Avoid These Patterns:**
+```typescript
+// ❌ WRONG - Cases<> short-circuits on first error (only shows one at a time)
+type _bad = Assert.Cases<
+  Assert.exact.string<string>,   // ✓ Pass
+  Assert.exact.of<string, number>,  // ✗ Error - stops here!
+  Assert.exact.boolean<boolean>  // Never checked - you won't see errors here
+>
 
 // ❌ WRONG - Don't wrap type tests in test blocks
 test('type tests', () => {
@@ -327,7 +395,8 @@ test('type tests', () => {
 - Type-level tests execute at compile time, not runtime - no need for test runner blocks
 - Flat structure is simpler and more direct
 - `_` prefix prevents "unused variable" lint errors
-- Keeps the distinction clear between type-level (compile-time) and value-level (runtime) tests
+- **Cases<> short-circuits** on first failure - extremely slow for debugging
+- Value-level API shows ALL failures simultaneously - much faster iteration
 
 ###### Type Testing in Tests
 
@@ -340,12 +409,32 @@ test('type tests', () => {
   - ✅ Better error messages at assertion site
   - Use in `.test.ts` AND `.test-d.ts` files
 
-- **Type-level**: `type _ = Ts.Assert.exact<Expected, Actual>`, `Ts.Assert.Cases<...>`
-  - ❌ Short-circuits on first failure
-  - ❌ Limited number of cases in Cases block
+- **Type-level** (DISCOURAGED): `type _ = Ts.Assert.exact<Expected, Actual>`, `Ts.Assert.Cases<...>`
+  - ❌ Short-circuits on first failure (fundamental TypeScript limitation)
+  - ❌ Limited to 100 cases in Cases block
   - ❌ Cannot be aliased
   - ⚠️ **CRITICAL**: Bare type assertions (`type _ = Ts.Assert.exact<>`) don't catch errors at type-check time unless wrapped in `Ts.Assert.Cases<>` - they pass through due to internal casts
-  - Only use when specifically needed, otherwise prefer value-level API
+  - **DO NOT USE `Ts.Assert.Cases<>` or `Ts.Assert.Case<>` unless explicitly instructed during a session**
+  - If you must use type-level, prefer individual type aliases over Cases<>
+
+**Why avoid Cases<>?**
+
+The short-circuiting behavior makes debugging extremely slow with multiple test cases:
+```typescript
+// ❌ You fix error on line 3, run tsc, see error on line 5, fix it, run tsc again, see error on line 7...
+type _ = Ts.Assert.Cases<
+  Assert.exact<string, string>,   // ✓ Pass
+  Assert.exact<number, string>,   // ✗ Error 1 - stops here
+  Assert.exact<boolean, boolean>, // Never evaluated
+  Assert.exact<symbol, string>,   // Never evaluated - Error 2 hidden
+  Assert.exact<bigint, string>    // Never evaluated - Error 3 hidden
+>
+
+// ✅ All 3 errors shown immediately - much faster iteration
+Assert.exact.ofAs<number>().onAs<string>()  // Error 1
+Assert.exact.ofAs<symbol>().onAs<string>()  // Error 2
+Assert.exact.ofAs<bigint>().onAs<string>()  // Error 3
+```
 
 - **CRITICAL**: ALWAYS read the JSDoc in `/Users/jasonkuhrt/projects/jasonkuhrt/kit/src/utils/ts/assert/` for the actual API - do not guess or use outdated examples
 
@@ -512,6 +601,7 @@ bench("keyword", () => {
 - GH issues: write to tmp file first to avoid shell issues
 - When debugging CI issues, use the `gh` CLI to investigate logs, workflows, and deployments directly
 - Check workflow runs, deployment statuses, and logs yourself before asking for debug information
+- **Default PR merge strategy: `--squash`** - Use squash merge by default when merging PRs with `gh pr merge`
 
 #### Git Worktree Management with `flo`
 
@@ -640,14 +730,56 @@ const content = ref_read_url(results[0].url)
 - GitHub repository searches
 - Complex multi-source research
 
+### Serena MCP
+
+#### Purpose
+- Semantic code navigation and editing
+
+#### When to Use
+- Navigating large codebases (prefer over grep/find for code understanding)
+- Finding symbol definitions and references
+- Editing code at symbol level (functions, classes, methods)
+- Understanding code relationships
+
+#### Core Pattern (CRITICAL)
+**Read as little code as possible. Use symbolic tools first.**
+
+1. **Explore first**: `get_symbols_overview` on file/directory
+2. **Find symbols**: `find_symbol` with `include_body=False` to see structure
+3. **Read only what's needed**: `find_symbol` with `include_body=True` for specific symbols
+4. **Understand relationships**: `find_referencing_symbols` before editing
+
+#### Editing Strategy
+- **Small changes** (few lines): Use `replace_regex` with wildcards
+- **Whole symbols** (function/class): Use `replace_symbol_body`
+- **Adding code**: Use `insert_before_symbol` / `insert_after_symbol`
+
+#### Anti-patterns (AVOID)
+- Reading entire files when you only need one function
+- Using `Read` tool when Serena's symbolic tools would be more efficient
+- Reading a file then re-reading with symbolic tools (wasteful)
+
+#### Full Instructions
+See `docs/prompts/serena.md` for comprehensive Serena usage guide.
+
+### effect-docs MCP
+
+#### Purpose
+- Effect framework documentation search
+
+#### When to Use
+- Searching Effect-specific APIs, types, and patterns
+- Understanding Effect modules and their usage
+
+#### Available Functions
+- `effect_docs_search(query)` - Search Effect documentation
+- `get_effect_doc(documentId, page?)` - Get full documentation content
+
 ### Priority Rules
 
-1. **Documentation**: Always try ref first, fall back to exa if not found
-2. **Current Events**: Always use exa (ref doesn't have real-time data)
-3. **Code Search**: Use exa's github_search for repositories
-4. **Research**: Use exa's deep_researcher for comprehensive analysis
-
-### Known Issues
-
-- **effect-docs MCP**: Currently broken - causes terminal to hang with long-running process (likely infinite loop or spawning many processes), resulting in severe input lag (5+ second delay per keypress). Do not use for Effect documentation.
-- Use alternative sources for Effect documentation (ref MCP, web search, or direct file inspection)
+1. **Code Navigation/Editing**: Use Serena for semantic code understanding (symbols, references, structure). Prefer over grep/Read for exploring unfamiliar code.
+2. **Effect Documentation**: Always try effect-docs MCP first for Effect framework questions (it's free/local). If the answer isn't found or is incomplete, then use ref MCP as fallback.
+3. **General Documentation**: Use ref MCP (costs money - use judiciously)
+4. **Current Events**: Always use exa (ref doesn't have real-time data)
+5. **Code Search**: Use exa's github_search for repositories
+6. **Research**: Use exa's deep_researcher for comprehensive analysis

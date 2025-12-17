@@ -1,0 +1,17 @@
+{
+  "description": "TypeScript type checking gate - blocks task completion if type errors exist",
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Before stopping, check if any TypeScript/JavaScript files (.ts, .tsx, .js, .jsx) were created or modified in this session. If NO TypeScript/JavaScript files were touched: return 'approve' immediately without running diagnostics. If TypeScript/JavaScript files WERE modified: use the tsgo MCP server's diagnostics tool to check for type errors. If there are type errors: return 'block' with the errors listed. If types are clean: return 'approve'. Only block for actual errors, not warnings.",
+            "timeout": 120
+          }
+        ]
+      }
+    ]
+  }
+}
